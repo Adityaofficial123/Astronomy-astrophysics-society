@@ -344,7 +344,7 @@
                 const isTechnical = (m) => /tech|technical/i.test(roleText(m));
                 const isTechnicalHead = (m) => /technical\s*head/i.test(roleText(m));
 
-                const founding = members.filter(isFounding).slice(0, 3);
+                const founding = members.filter(isFounding);
                 const technical = members.filter(m => !isFounding(m) && isTechnical(m));
                 const regular = members.filter(m => !isFounding(m) && !isTechnical(m));
 
