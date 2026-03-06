@@ -10,12 +10,17 @@
         if (path.includes('programs')) loadEvents();
         if (path.includes('gallery')) loadGallery();
 
-        if (path.includes('index') || path === '/') {
-            initThreeJS();
-            initDailyFact();   // ⭐ ADD THIS LINE
-        } else {
-            initCanvasStars();
-        }
+       if (
+    path.includes('index') ||
+    path === '/' ||
+    path.endsWith('/Astro-Web/') ||
+    path.endsWith('/Astro-Web/index.html')
+) {
+    initThreeJS();
+    initDailyFact();
+} else {
+    initCanvasStars();
+}
 
         if (typeof AOS !== 'undefined') AOS.init({ duration: 800, once: true });
     }); 
