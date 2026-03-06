@@ -13,8 +13,8 @@
        if (
     path.includes('index') ||
     path === '/' ||
-    path.endsWith('/Astro-Web/') ||
-    path.endsWith('/Astro-Web/index.html')
+    path.endsWith('/Astronomy-astrophysics-society/') ||
+    path.endsWith('/Astronomy-astrophysics-society/index.html')
 ) {
     initThreeJS();
     initDailyFact();
