@@ -2,8 +2,8 @@ const CONFIG = {
     firebase: {
         apiKey: "AIzaSyC_1zweWRYkW9wrLTx1nSEE9hZHo0BCEkg",
         authDomain: "astrosoc-72c8f.firebaseapp.com",
-        databaseURL: "https://astrosoc-72c8f-default-rtdb.firebaseio.com",
         projectId: "astrosoc-72c8f",
+        databaseURL: "https://astrosoc-72c8f-default-rtdb.firebaseio.com",
         storageBucket: "astrosoc-72c8f.firebasestorage.app",
         messagingSenderId: "817813105793",
         appId: "1:817813105793:web:f7d38982e7fb5d83f0b180"
@@ -12,4 +12,5 @@ const CONFIG = {
         cloudName: "dobzp321s", 
         uploadPreset: "your_upload_preset" // You need to set this in your Cloudinary dashboard
     }
+
 };
