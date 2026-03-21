@@ -16,16 +16,92 @@
     <!-- Background Canvas -->
     <div id="bg-canvas"></div>
 
-    <section class="min-h-screen pt-32 pb-20 px-4 sm:px-6 lg:px-8">
+    <section class="min-h-screen pt-32 pb-20 px-4 sm:px-6 lg:px-8 relative z-10">
         <div class="container mx-auto max-w-7xl text-center mb-12">
-            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 gradient-text" data-aos="fade-down">Deep Space Imaging</h1>
-            <p class="text-gray-400 text-base sm:text-lg">Captured by our members using 8" and 10" telescopes.</p>
+            <p class="text-xs tracking-[0.35em] uppercase text-cyan-400/80 mb-3 font-mono" data-aos="fade-down">Mission Archive</p>
+            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 gradient-text" data-aos="fade-down">Deep Space Gallery</h1>
+            <p class="text-gray-400 text-base sm:text-lg max-w-3xl mx-auto" data-aos="fade-up">
+                A curated visual archive of our observations, outreach nights, and celestial captures by AAS members.
+                Explore by object type, search specific targets, and inspect each frame in detail.
+            </p>
+        </div>
+
+        <div id="galleryMetaCards" class="container mx-auto max-w-7xl grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
+            <div class="holo-card p-5 text-sm text-gray-300">
+                <div class="text-xs uppercase tracking-[0.22em] text-cyan-300/80 mb-2">Archive Items</div>
+                <div class="text-2xl font-bold text-white">--</div>
+            </div>
+            <div class="holo-card p-5 text-sm text-gray-300">
+                <div class="text-xs uppercase tracking-[0.22em] text-cyan-300/80 mb-2">Latest Upload</div>
+                <div class="text-2xl font-bold text-white">--</div>
+            </div>
+            <div class="holo-card p-5 text-sm text-gray-300">
+                <div class="text-xs uppercase tracking-[0.22em] text-cyan-300/80 mb-2">Sky Categories</div>
+                <div class="text-2xl font-bold text-white">--</div>
+            </div>
+            <div class="holo-card p-5 text-sm text-gray-300">
+                <div class="text-xs uppercase tracking-[0.22em] text-cyan-300/80 mb-2">Most Captured</div>
+                <div class="text-2xl font-bold text-white">--</div>
+            </div>
+        </div>
+
+        <div class="container mx-auto max-w-7xl mb-6">
+            <div class="holo-card p-4 md:p-5">
+                <div class="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-4 items-end">
+                    <div>
+                        <label for="gallerySearchInput" class="text-xs uppercase tracking-[0.2em] text-gray-400 block mb-2">Search Captures</label>
+                        <input id="gallerySearchInput" type="text" placeholder="Search by caption, object, or keyword..." class="input-field">
+                    </div>
+                    <div class="lg:w-56">
+                        <label for="gallerySortSelect" class="text-xs uppercase tracking-[0.2em] text-gray-400 block mb-2">Sort By</label>
+                        <select id="gallerySortSelect" class="input-field bg-black/40">
+                            <option value="newest">Newest First</option>
+                            <option value="oldest">Oldest First</option>
+                            <option value="az">Caption A-Z</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="galleryCategoryFilters" class="mt-4 flex flex-wrap gap-2"></div>
+            </div>
         </div>
 
         <div id="galleryGrid" class="container mx-auto max-w-7xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             <div class="col-span-full text-center py-20 text-cyan-500 animate-pulse">Downloading telemetry...</div>
         </div>
     </section>
+
+    <div id="galleryLightbox" class="hidden fixed inset-0 z-[120]">
+        <button id="galleryLightboxBackdrop" class="absolute inset-0 bg-black/90 backdrop-blur-sm" aria-label="Close preview"></button>
+        <div class="relative z-10 h-full w-full flex items-center justify-center px-4 py-10">
+            <div class="w-full max-w-5xl holo-card border-white/20 bg-[#030612]/95 overflow-hidden">
+                <div class="flex items-center justify-between px-5 py-4 border-b border-white/10">
+                    <div class="text-xs uppercase tracking-[0.25em] text-cyan-300/70">Image Preview</div>
+                    <button id="galleryLightboxClose" class="text-gray-300 hover:text-white text-lg" aria-label="Close image">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="grid lg:grid-cols-[1fr_260px] gap-0">
+                    <div class="bg-black/40 min-h-[300px] flex items-center justify-center">
+                        <img id="galleryLightboxImage" src="" alt="Gallery preview" class="w-full max-h-[70vh] object-contain">
+                    </div>
+                    <div class="border-l border-white/10 p-5 bg-white/[0.03]">
+                        <div id="galleryLightboxCategory" class="inline-flex text-[10px] uppercase tracking-[0.2em] px-2 py-1 rounded-full border border-cyan-500/30 text-cyan-300 mb-3">Sky Object</div>
+                        <h3 id="galleryLightboxCaption" class="text-xl font-bold text-white leading-snug mb-3">Capture</h3>
+                        <p id="galleryLightboxMeta" class="text-sm text-gray-400 leading-relaxed">Metadata unavailable.</p>
+                        <div id="galleryLightboxDetails" class="mt-4 space-y-1 text-xs text-gray-300"></div>
+                        <p id="galleryLightboxDescription" class="mt-4 text-sm text-gray-400 leading-relaxed"></p>
+                        <div class="mt-6 grid grid-cols-2 gap-2">
+                            <button id="galleryLightboxPrev" class="filter-btn text-xs"><i class="fas fa-arrow-left mr-1"></i>Previous</button>
+                            <button id="galleryLightboxNext" class="filter-btn text-xs">Next<i class="fas fa-arrow-right ml-1"></i></button>
+                        </div>
+                        <a href="index.html#home-gallery-marquee" class="mt-4 inline-flex items-center gap-2 text-xs uppercase tracking-[0.16em] text-cyan-300 hover:text-cyan-200 transition">
+                            <i class="fas fa-stream"></i> View Home Scroller
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
