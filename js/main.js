@@ -2,6 +2,25 @@ document.addEventListener('DOMContentLoaded', () => {
     initLoader(); // Start with loader
 });
 
+const DEFAULT_SITE_SETTINGS = {
+    siteName: 'ASTRONOMY & ASTROPHYSICS SOCIETY',
+    heroBadge: 'Government College of Engineering — GCOEA',
+    heroTitleLine1: 'Exploring The',
+    heroTitleLine2: 'Infinite Cosmos',
+    heroSubtitle: 'Observe. Discover. Understand the universe.',
+    heroPrimaryText: 'Join Mission',
+    heroPrimaryUrl: 'members.html',
+    heroSecondaryText: 'Explore Programs',
+    heroSecondaryUrl: 'programs.html',
+    footerAbout: 'Exploring the infinite cosmos, one star at a time. Join our mission to decode the universe through observation and research.',
+    whatsappUrl: 'https://chat.whatsapp.com/IQbOWh8nZhN401xweqOG4z?mode=gi_t',
+    instagramUrl: 'https://www.instagram.com/aasg_gcoea?igsh=OGE5ODhtYzkzb2hi',
+    supportEmail: 'astrophy@gcoea.in',
+    contactEmailDisplay: 'adityataywadeofficial@gmail.com',
+};
+
+let siteSettingsCache = { ...DEFAULT_SITE_SETTINGS };
+
 // 2. CINEMATIC LOADER
 function initLoader() {
     const loader = document.getElementById('cinematic-loader');
@@ -39,9 +58,11 @@ function initLoader() {
 }
 
 function initApp() {
-    injectComponents();
     initCursor();
     initFirebase();
+    injectComponents();
+    applySiteSettingsToDOM();
+    loadSiteSettings();
 
     const path = window.location.pathname;
 
@@ -53,6 +74,7 @@ function initApp() {
         initThreeJS(); // Stars background
         initCosmicSystem(); // Hero cosmic system only on home
         initDailyFact();
+        loadHomeGalleryScroller();
     } else {
         initCanvasStars();
     }
@@ -78,8 +100,8 @@ function injectComponents() {
                     <img src="logo.png" alt="Astronomy & Astrophysics Society logo" class="nav-logo__img">
                 </div>
                 <span class="nav-brand text-white font-heading font-bold tracking-[0.14em] uppercase leading-tight">
-                    <span class="nav-brand__full hidden sm:inline">ASTRONOMY &amp; ASTROPHYSICS SOCIETY</span>
-                    <span class="nav-brand__short sm:hidden">ASTRONOMY &amp; ASTROPHYSICS SOCIETY</span>
+                    <span id="navBrandFull" class="nav-brand__full hidden sm:inline">ASTRONOMY &amp; ASTROPHYSICS SOCIETY</span>
+                    <span id="navBrandShort" class="nav-brand__short sm:hidden">ASTRONOMY &amp; ASTROPHYSICS SOCIETY</span>
                 </span>
             </div>
             <div class="hidden md:flex items-center gap-8">
@@ -153,9 +175,9 @@ function injectComponents() {
                                 <div class="w-10 h-10 bg-gradient-to-br from-cyan-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg shadow-cyan-500/20">
                                     <i class="fas fa-meteor text-white"></i>
                                 </div>
-                                <span class="text-xl sm:text-2xl font-bold tracking-[0.14em] text-white uppercase" style="font-family: 'Orbitron', sans-serif;">ASTRONOMY &amp; ASTROPHYSICS SOCIETY</span>
+                                <span id="footerBrandTitle" class="text-xl sm:text-2xl font-bold tracking-[0.14em] text-white uppercase" style="font-family: 'Orbitron', sans-serif;">ASTRONOMY &amp; ASTROPHYSICS SOCIETY</span>
                             </div>
-                            <p class="text-gray-400 leading-relaxed">
+                            <p id="footerAboutText" class="text-gray-400 leading-relaxed">
                                 Exploring the infinite cosmos, one star at a time. Join our mission to decode the universe through observation and research.
                             </p>
                         </div>
@@ -187,20 +209,20 @@ function injectComponents() {
                             
                             <!-- Social Links -->
                             <div class="space-y-4">
-                                <a href="https://chat.whatsapp.com/IQbOWh8nZhN401xweqOG4z?mode=gi_t" target="_blank" class="group flex items-center gap-3 p-3 rounded-lg border border-white/5 bg-white/5 hover:bg-white/10 hover:border-green-500/50 transition-all duration-300">
+                                <a id="footerWhatsappLink" href="https://chat.whatsapp.com/IQbOWh8nZhN401xweqOG4z?mode=gi_t" target="_blank" class="group flex items-center gap-3 p-3 rounded-lg border border-white/5 bg-white/5 hover:bg-white/10 hover:border-green-500/50 transition-all duration-300">
                                     <div class="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center group-hover:bg-green-500 group-hover:text-white transition">
                                         <i class="fab fa-whatsapp text-green-400 group-hover:text-white"></i>
                                     </div>
                                     <span class="text-gray-300 group-hover:text-white">WhatsApp Channel</span>
                                 </a>
 
-                                <a href="https://www.instagram.com/aasg_gcoea?igsh=OGE5ODhtYzkzb2hi" target="_blank" class="group flex items-center gap-3 p-3 rounded-lg border border-white/5 bg-white/5 hover:bg-white/10 hover:border-pink-500/50 transition-all duration-300">
+                                <a id="footerInstagramLink" href="https://www.instagram.com/aasg_gcoea?igsh=OGE5ODhtYzkzb2hi" target="_blank" class="group flex items-center gap-3 p-3 rounded-lg border border-white/5 bg-white/5 hover:bg-white/10 hover:border-pink-500/50 transition-all duration-300">
                                     <div class="w-8 h-8 rounded-full bg-pink-500/20 flex items-center justify-center group-hover:bg-pink-500 group-hover:text-white transition">
                                         <i class="fab fa-instagram text-pink-400 group-hover:text-white"></i>
                                     </div>
                                     <span class="text-gray-300 group-hover:text-white">Instagram</span>
                                 </a>
-<a href="mailto:astrophy@gcoea.in" class="group flex items-center gap-3 p-3 rounded-lg border border-white/5 bg-white/5 hover:bg-white/10 hover:border-blue-500/50 transition-all duration-300">
+<a id="footerEmailLink" href="mailto:astrophy@gcoea.in" class="group flex items-center gap-3 p-3 rounded-lg border border-white/5 bg-white/5 hover:bg-white/10 hover:border-blue-500/50 transition-all duration-300">
     
     <div class="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center group-hover:bg-blue-500 group-hover:text-white transition">
         <i class="fas fa-envelope text-blue-400 group-hover:text-white"></i>
@@ -213,7 +235,7 @@ function injectComponents() {
 
                             <div class="mt-6 flex items-center gap-2 text-sm text-gray-500">
                                 <i class="fas fa-envelope text-cyan-500"></i>
-                                <span>adityataywadeofficial@gmail.com</span>
+                                <span id="footerContactEmail">adityataywadeofficial@gmail.com</span>
                             </div>
                         </div>
                     </div>
@@ -378,6 +400,60 @@ function initFirebase() {
     }
 }
 
+function loadSiteSettings() {
+    if (!db) {
+        applySiteSettingsToDOM();
+        return;
+    }
+
+    db.ref('siteSettings').once('value')
+        .then((snap) => {
+            const data = snap.val() || {};
+            siteSettingsCache = { ...DEFAULT_SITE_SETTINGS, ...data };
+            applySiteSettingsToDOM();
+        })
+        .catch((err) => {
+            console.error('[SiteSettings] load failed', err);
+            applySiteSettingsToDOM();
+        });
+}
+
+function applySiteSettingsToDOM() {
+    const s = { ...DEFAULT_SITE_SETTINGS, ...(siteSettingsCache || {}) };
+
+    const setText = (id, value) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = String(value || '');
+    };
+    const setHref = (id, value) => {
+        const el = document.getElementById(id);
+        if (el && value) el.setAttribute('href', value);
+    };
+
+    setText('navBrandFull', s.siteName);
+    setText('navBrandShort', s.siteName);
+    setText('footerBrandTitle', s.siteName);
+    setText('footerAboutText', s.footerAbout);
+
+    const supportHref = String(s.supportEmail || '').trim()
+        ? (String(s.supportEmail).startsWith('mailto:') ? String(s.supportEmail) : `mailto:${String(s.supportEmail).trim()}`)
+        : `mailto:${DEFAULT_SITE_SETTINGS.supportEmail}`;
+
+    setHref('footerWhatsappLink', s.whatsappUrl || DEFAULT_SITE_SETTINGS.whatsappUrl);
+    setHref('footerInstagramLink', s.instagramUrl || DEFAULT_SITE_SETTINGS.instagramUrl);
+    setHref('footerEmailLink', supportHref);
+    setText('footerContactEmail', s.contactEmailDisplay || DEFAULT_SITE_SETTINGS.contactEmailDisplay);
+
+    setText('heroBadgeText', s.heroBadge);
+    setText('heroTitleLine1', s.heroTitleLine1);
+    setText('heroTitleLine2', s.heroTitleLine2);
+    setText('heroSubtitleText', s.heroSubtitle);
+    setText('heroPrimaryCtaText', s.heroPrimaryText);
+    setText('heroSecondaryCtaText', s.heroSecondaryText);
+    setHref('heroPrimaryCta', s.heroPrimaryUrl || DEFAULT_SITE_SETTINGS.heroPrimaryUrl);
+    setHref('heroSecondaryCta', s.heroSecondaryUrl || DEFAULT_SITE_SETTINGS.heroSecondaryUrl);
+}
+
 function loadMembers() {
     if (!db) return;
     db.ref('members').on('value', snap => {
@@ -389,13 +465,15 @@ function loadMembers() {
             const normalize = (s) => String(s || '').trim();
             const roleText = (m) => normalize(m.role);
             const roleKey = (m) => roleText(m).toLowerCase();
+            const isFacultyAdvisor = (m) => /faculty\s*advisor/i.test(roleText(m));
             const isFounding = (m) => /(founding|founder|founded|foun(d|i)d)/i.test(roleKey(m));
             const isTechnical = (m) => /tech|technical/i.test(roleText(m));
             const isTechnicalHead = (m) => /technical\s*head/i.test(roleText(m));
 
-            const founding = members.filter(isFounding);
-            const technical = members.filter(m => !isFounding(m) && isTechnical(m));
-            const regular = members.filter(m => !isFounding(m) && !isTechnical(m));
+            const faculty = members.filter(isFacultyAdvisor);
+            const founding = members.filter(m => !isFacultyAdvisor(m) && isFounding(m));
+            const technical = members.filter(m => !isFacultyAdvisor(m) && !isFounding(m) && isTechnical(m));
+            const regular = members.filter(m => !isFacultyAdvisor(m) && !isFounding(m) && !isTechnical(m));
 
             const card = (m, variant) => {
                 const img = m.image || 'https://via.placeholder.com/256';
@@ -403,14 +481,20 @@ function loadMembers() {
                 const role = roleText(m) || 'Member';
                 const branch = normalize(m.branch);
                 const year = normalize(m.year);
+                const designation = normalize(m.designation);
+                const secondaryMeta = variant === 'faculty' ? (designation || year) : year;
 
-                const variantClass = variant === 'founding'
-                    ? 'member-card member-card--founding'
-                    : (isTechnicalHead(m) ? 'member-card member-card--tech-head' : 'member-card');
+                const variantClass = variant === 'faculty'
+                    ? 'member-card member-card--faculty'
+                    : (variant === 'founding'
+                        ? 'member-card member-card--founding'
+                        : (isTechnicalHead(m) ? 'member-card member-card--tech-head' : 'member-card'));
 
-                const roleBadgeClass = variant === 'founding'
-                    ? 'member-role member-role--founding'
-                    : (isTechnicalHead(m) ? 'member-role member-role--tech-head' : 'member-role');
+                const roleBadgeClass = variant === 'faculty'
+                    ? 'member-role member-role--faculty'
+                    : (variant === 'founding'
+                        ? 'member-role member-role--founding'
+                        : (isTechnicalHead(m) ? 'member-role member-role--tech-head' : 'member-role'));
 
                 return `
                         <div class="holo-card p-6 text-center group ${variantClass}">
@@ -423,7 +507,7 @@ function loadMembers() {
                             <h3 class="text-xl font-bold text-white">${name}</h3>
                             <div class="member-meta">
                                 ${branch ? `<div class=\"member-meta-branch\">${branch}</div>` : ''}
-                                ${year ? `<div class=\"member-meta-year\">${year}</div>` : ''}
+                                ${secondaryMeta ? `<div class=\"member-meta-year\">${secondaryMeta}</div>` : ''}
                             </div>
                         </div>
                     `;
@@ -443,6 +527,7 @@ function loadMembers() {
             };
 
             grid.innerHTML = [
+                section('Faculty Advisors', faculty, 'faculty'),
                 section('Founding Members', founding, 'founding'),
                 section('Technical Team', technical, 'tech'),
                 section('Members', regular, 'regular')
@@ -555,33 +640,510 @@ function loadEvents() {
     });
 }
 
+const GALLERY_CATEGORY_META = {
+    all: { label: 'All', icon: 'fa-globe' },
+    nebula: { label: 'Nebula', icon: 'fa-cloud' },
+    galaxy: { label: 'Galaxy', icon: 'fa-circle-notch' },
+    moon: { label: 'Moon', icon: 'fa-moon' },
+    planet: { label: 'Planet', icon: 'fa-earth-asia' },
+    sun: { label: 'Sun', icon: 'fa-sun' },
+    cluster: { label: 'Cluster', icon: 'fa-braille' },
+    constellation: { label: 'Constellation', icon: 'fa-star-and-crescent' },
+    comet: { label: 'Comet', icon: 'fa-meteor' },
+    star: { label: 'Star', icon: 'fa-star' },
+    other: { label: 'Other', icon: 'fa-satellite' },
+};
+
+const galleryState = {
+    query: '',
+    category: 'all',
+    sort: 'newest',
+};
+
+let galleryItemsCache = [];
+let galleryFilteredItems = [];
+let galleryLightboxIndex = 0;
+
+function escapeHTML(value) {
+    return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+function parseGalleryTimestamp(raw) {
+    if (typeof raw === 'number' && Number.isFinite(raw)) return raw;
+    if (typeof raw === 'string' && raw.trim()) {
+        const asNum = Number(raw);
+        if (Number.isFinite(asNum)) return asNum;
+        const parsed = Date.parse(raw);
+        if (Number.isFinite(parsed)) return parsed;
+    }
+    return 0;
+}
+
+function inferGalleryCategory(caption) {
+    const text = String(caption || '').toLowerCase();
+
+    if (/(nebula|m42|orion|carina|lagoon|trifid|veil|rosette|eagle|pillars|helix)/.test(text)) return 'nebula';
+    if (/(galaxy|m31|andromeda|milky\s*way|spiral|whirlpool|sombrero)/.test(text)) return 'galaxy';
+    if (/(moon|lunar|crescent|gibbous|crater|supermoon|apollo)/.test(text)) return 'moon';
+    if (/(jupiter|saturn|mars|venus|mercury|uranus|neptune|planet)/.test(text)) return 'planet';
+    if (/(sun|solar|sunspot|prominence|eclipse)/.test(text)) return 'sun';
+    if (/(cluster|globular|m45|pleiades|open cluster|omega centauri)/.test(text)) return 'cluster';
+    if (/(constellation|ursa|cassiopeia|cygnus|lyra|orion belt|scorpius)/.test(text)) return 'constellation';
+    if (/(comet|meteor|meteorite|asteroid|perseid|geminid|shower)/.test(text)) return 'comet';
+    if (/(star|sirius|polaris|betelgeuse|binary)/.test(text)) return 'star';
+    return 'other';
+}
+
+function normalizeGalleryData(data) {
+    return Object.entries(data || {})
+        .map(([id, item]) => {
+            const caption = String(item.caption || 'Untitled Capture').trim() || 'Untitled Capture';
+            const url = String(item.url || '').trim();
+            const type = String(item.type || 'image').toLowerCase() === 'video' ? 'video' : 'image';
+            const createdAt = parseGalleryTimestamp(item.createdAt || item.date || item.uploadedAt);
+            const captureDate = String(item.captureDate || '').trim();
+            const captureAt = parseGalleryTimestamp(captureDate);
+            const objectName = String(item.objectName || '').trim();
+            const description = String(item.description || '').trim();
+            const photographer = String(item.photographer || '').trim();
+            const location = String(item.location || '').trim();
+            const telescope = String(item.telescope || '').trim();
+            const camera = String(item.camera || '').trim();
+            const exposure = String(item.exposure || '').trim();
+            const category = inferGalleryCategory(`${caption} ${objectName}`);
+            const timelineTs = captureAt || createdAt;
+
+            return {
+                id,
+                caption,
+                url,
+                type,
+                createdAt,
+                captureDate,
+                captureAt,
+                timelineTs,
+                objectName,
+                description,
+                photographer,
+                location,
+                telescope,
+                camera,
+                exposure,
+                category,
+            };
+        })
+        .filter(item => item.url)
+        .sort((a, b) => (b.timelineTs || 0) - (a.timelineTs || 0));
+}
+
+function formatGalleryDate(ts) {
+    if (!ts) return 'Date unavailable';
+    return new Date(ts).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+    });
+}
+
+function formatGalleryRelative(ts) {
+    if (!ts) return 'Archive date not set';
+
+    const dayMs = 86400000;
+    const diff = Math.max(0, Math.floor((Date.now() - ts) / dayMs));
+    if (diff === 0) return 'Captured today';
+    if (diff === 1) return 'Captured 1 day ago';
+    if (diff < 30) return `Captured ${diff} days ago`;
+    const months = Math.floor(diff / 30);
+    if (months < 12) return `Captured ${months} month${months === 1 ? '' : 's'} ago`;
+    const years = Math.floor(months / 12);
+    return `Captured ${years} year${years === 1 ? '' : 's'} ago`;
+}
+
+function getGalleryCategoryMeta(key) {
+    return GALLERY_CATEGORY_META[key] || GALLERY_CATEGORY_META.other;
+}
+
 function loadGallery() {
     if (!db) return;
     db.ref('gallery').once('value', snap => {
-        const data = snap.val() || {};
-        const grid = document.getElementById('galleryGrid');
-        if (grid) {
-            const items = Object.values(data);
-            grid.innerHTML = items.map(g => {
-                const type = (g.type || 'image');
-                const caption = g.caption || '';
-                const url = g.url || '';
-
-                const media = type === 'video'
-                    ? `<video src="${url}" class="w-full h-full object-cover transition duration-500 group-hover:scale-110" muted playsinline controls></video>`
-                    : `<img src="${url}" class="w-full h-full object-cover transition duration-500 group-hover:scale-110" alt="${caption.replace(/\"/g, '&quot;')}">`;
-
-                return `
-                        <div class="holo-card overflow-hidden cursor-pointer group relative h-64">
-                            ${media}
-                            <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition flex items-end p-4">
-                                <p class="text-white font-bold">${caption}</p>
-                            </div>
-                        </div>
-                    `;
-            }).join('');
-        }
+        galleryItemsCache = normalizeGalleryData(snap.val() || {});
+        renderGalleryMetaCards(galleryItemsCache);
+        renderGalleryCategoryFilters(galleryItemsCache);
+        bindGalleryControls();
+        applyGalleryFilters();
+        initGalleryLightbox();
     });
+}
+
+function loadHomeGalleryScroller() {
+    if (!db) return;
+    const track = document.getElementById('homeGalleryTrack');
+    if (!track) return;
+
+    db.ref('gallery').once('value', snap => {
+        const items = normalizeGalleryData(snap.val() || {});
+        renderHomeGalleryScroller(items);
+    });
+}
+
+function renderGalleryMetaCards(items) {
+    const wrapper = document.getElementById('galleryMetaCards');
+    if (!wrapper) return;
+
+    const counts = items.reduce((acc, item) => {
+        acc[item.category] = (acc[item.category] || 0) + 1;
+        return acc;
+    }, {});
+
+    const categoryKeys = Object.keys(counts);
+    const categoryCount = categoryKeys.length;
+    const ranked = categoryKeys
+        .map((key) => ({ key, count: counts[key] }))
+        .sort((a, b) => b.count - a.count);
+
+    const top = ranked[0];
+    const latest = items.find(item => item.timelineTs);
+
+    const metaCards = [
+        {
+            label: 'Archive Items',
+            value: String(items.length),
+            hint: 'Total captures in the gallery archive.',
+            icon: 'fa-images',
+        },
+        {
+            label: 'Latest Capture',
+            value: latest ? formatGalleryDate(latest.timelineTs) : 'Unknown',
+            hint: latest ? formatGalleryRelative(latest.timelineTs) : 'Add capture date in Admin for accurate timeline.',
+            icon: 'fa-clock',
+        },
+        {
+            label: 'Sky Categories',
+            value: String(categoryCount),
+            hint: 'Distinct celestial categories identified from captions.',
+            icon: 'fa-layer-group',
+        },
+        {
+            label: 'Most Captured',
+            value: top ? getGalleryCategoryMeta(top.key).label : 'N/A',
+            hint: top ? `${top.count} capture${top.count === 1 ? '' : 's'}` : 'No category data yet.',
+            icon: 'fa-bullseye',
+        },
+    ];
+
+    wrapper.innerHTML = metaCards.map(card => `
+        <article class="holo-card gallery-meta-card p-5">
+            <div class="flex items-center justify-between gap-3">
+                <div class="text-xs uppercase tracking-[0.22em] text-cyan-300/80">${card.label}</div>
+                <i class="fas ${card.icon} text-cyan-300/70"></i>
+            </div>
+            <div class="mt-3 text-2xl font-bold text-white">${escapeHTML(card.value)}</div>
+            <p class="mt-2 text-sm text-gray-400 leading-relaxed">${escapeHTML(card.hint)}</p>
+        </article>
+    `).join('');
+}
+
+function renderGalleryCategoryFilters(items) {
+    const container = document.getElementById('galleryCategoryFilters');
+    if (!container) return;
+
+    const counts = items.reduce((acc, item) => {
+        acc[item.category] = (acc[item.category] || 0) + 1;
+        return acc;
+    }, {});
+
+    const order = ['all', 'nebula', 'galaxy', 'moon', 'planet', 'sun', 'cluster', 'constellation', 'comet', 'star', 'other'];
+    const chips = order
+        .filter(key => key === 'all' || counts[key])
+        .map((key) => {
+            const meta = getGalleryCategoryMeta(key);
+            const count = key === 'all' ? items.length : (counts[key] || 0);
+            const active = galleryState.category === key ? 'active' : '';
+            return `
+                <button type="button" class="gallery-chip ${active}" data-gallery-category="${key}">
+                    <i class="fas ${meta.icon} text-[10px]"></i>
+                    <span>${meta.label}</span>
+                    <span class="gallery-chip-count">${count}</span>
+                </button>
+            `;
+        });
+
+    container.innerHTML = chips.join('');
+}
+
+function bindGalleryControls() {
+    const searchInput = document.getElementById('gallerySearchInput');
+    const sortSelect = document.getElementById('gallerySortSelect');
+    const filterWrap = document.getElementById('galleryCategoryFilters');
+    const grid = document.getElementById('galleryGrid');
+
+    if (searchInput && !searchInput.dataset.bound) {
+        searchInput.dataset.bound = 'true';
+        searchInput.addEventListener('input', () => {
+            galleryState.query = searchInput.value.trim().toLowerCase();
+            applyGalleryFilters();
+        });
+    }
+
+    if (sortSelect && !sortSelect.dataset.bound) {
+        sortSelect.dataset.bound = 'true';
+        sortSelect.addEventListener('change', () => {
+            galleryState.sort = sortSelect.value;
+            applyGalleryFilters();
+        });
+    }
+
+    if (filterWrap && !filterWrap.dataset.bound) {
+        filterWrap.dataset.bound = 'true';
+        filterWrap.addEventListener('click', (event) => {
+            const chip = event.target.closest('[data-gallery-category]');
+            if (!chip) return;
+            galleryState.category = chip.getAttribute('data-gallery-category') || 'all';
+            applyGalleryFilters();
+        });
+    }
+
+    if (grid && !grid.dataset.bound) {
+        grid.dataset.bound = 'true';
+        grid.addEventListener('click', (event) => {
+            const card = event.target.closest('[data-gallery-index]');
+            if (!card) return;
+            const index = Number(card.getAttribute('data-gallery-index'));
+            if (!Number.isFinite(index)) return;
+            openGalleryLightbox(index);
+        });
+    }
+}
+
+function applyGalleryFilters() {
+    const tokens = galleryState.query.split(/\s+/).filter(Boolean);
+
+    let result = galleryItemsCache.filter((item) => {
+        if (galleryState.category !== 'all' && item.category !== galleryState.category) return false;
+        if (!tokens.length) return true;
+        const haystack = [
+            item.caption,
+            item.objectName,
+            item.description,
+            item.photographer,
+            item.location,
+            item.telescope,
+            item.camera,
+            item.exposure,
+            item.category,
+        ].join(' ').toLowerCase();
+        return tokens.every(t => haystack.includes(t));
+    });
+
+    if (galleryState.sort === 'oldest') {
+        result.sort((a, b) => (a.timelineTs || 0) - (b.timelineTs || 0));
+    } else if (galleryState.sort === 'az') {
+        result.sort((a, b) => a.caption.localeCompare(b.caption));
+    } else {
+        result.sort((a, b) => (b.timelineTs || 0) - (a.timelineTs || 0));
+    }
+
+    galleryFilteredItems = result;
+    renderGalleryCategoryFilters(galleryItemsCache);
+    renderGalleryGrid(galleryFilteredItems);
+}
+
+function renderGalleryGrid(items) {
+    const grid = document.getElementById('galleryGrid');
+    if (!grid) return;
+
+    if (!items.length) {
+        grid.innerHTML = `
+            <div class="col-span-full">
+                <div class="holo-card p-10 text-center">
+                    <div class="text-cyan-300 text-lg font-semibold mb-2">No captures found for current filters</div>
+                    <p class="text-gray-400 mb-5">Try another search term or category to explore the full archive.</p>
+                    <button type="button" class="filter-btn" data-gallery-reset>Reset Filters</button>
+                </div>
+            </div>
+        `;
+        const resetBtn = grid.querySelector('[data-gallery-reset]');
+        if (resetBtn) {
+            resetBtn.addEventListener('click', () => {
+                galleryState.query = '';
+                galleryState.category = 'all';
+                galleryState.sort = 'newest';
+
+                const searchInput = document.getElementById('gallerySearchInput');
+                const sortSelect = document.getElementById('gallerySortSelect');
+                if (searchInput) searchInput.value = '';
+                if (sortSelect) sortSelect.value = 'newest';
+
+                applyGalleryFilters();
+            });
+        }
+        return;
+    }
+
+    grid.innerHTML = items.map((item, index) => {
+        const categoryMeta = getGalleryCategoryMeta(item.category);
+        const caption = escapeHTML(item.caption);
+        const dateText = escapeHTML(formatGalleryDate(item.timelineTs));
+        const relative = escapeHTML(formatGalleryRelative(item.timelineTs));
+        const objectName = escapeHTML(item.objectName || categoryMeta.label);
+        const photographer = escapeHTML(item.photographer || 'AAS Team');
+        const categoryLabel = escapeHTML(categoryMeta.label);
+
+        const media = item.type === 'video'
+            ? `<video src="${item.url}" class="w-full h-full object-cover transition duration-500 group-hover:scale-110" muted playsinline loop autoplay></video>`
+            : `<img src="${item.url}" class="w-full h-full object-cover transition duration-500 group-hover:scale-110" alt="${caption}" loading="lazy">`;
+
+        return `
+            <button type="button" class="holo-card gallery-media-card overflow-hidden cursor-pointer group relative h-72 text-left" data-gallery-index="${index}">
+                ${media}
+                <div class="gallery-media-gradient"></div>
+                <div class="absolute top-3 left-3 z-10">
+                    <span class="gallery-media-badge"><i class="fas ${categoryMeta.icon}"></i>${categoryLabel}</span>
+                </div>
+                <div class="absolute inset-x-0 bottom-0 z-10 p-4">
+                    <p class="text-white font-bold leading-snug">${caption}</p>
+                    <p class="mt-1 text-xs text-cyan-200/90 uppercase tracking-[0.11em]">${objectName}</p>
+                    <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-gray-300/90 uppercase tracking-[0.08em]">
+                        <span><i class="far fa-calendar mr-1 text-cyan-300"></i>${dateText}</span>
+                        <span><i class="fas fa-satellite mr-1 text-cyan-300"></i>${relative}</span>
+                        <span><i class="fas fa-user-astronaut mr-1 text-cyan-300"></i>${photographer}</span>
+                    </div>
+                </div>
+            </button>
+        `;
+    }).join('');
+}
+
+function initGalleryLightbox() {
+    const modal = document.getElementById('galleryLightbox');
+    const closeBtn = document.getElementById('galleryLightboxClose');
+    const backdrop = document.getElementById('galleryLightboxBackdrop');
+    const prevBtn = document.getElementById('galleryLightboxPrev');
+    const nextBtn = document.getElementById('galleryLightboxNext');
+
+    if (!modal || modal.dataset.bound) return;
+    modal.dataset.bound = 'true';
+
+    closeBtn?.addEventListener('click', closeGalleryLightbox);
+    backdrop?.addEventListener('click', closeGalleryLightbox);
+    prevBtn?.addEventListener('click', () => shiftGalleryLightbox(-1));
+    nextBtn?.addEventListener('click', () => shiftGalleryLightbox(1));
+
+    document.addEventListener('keydown', (event) => {
+        if (modal.classList.contains('hidden')) return;
+        if (event.key === 'Escape') closeGalleryLightbox();
+        if (event.key === 'ArrowLeft') shiftGalleryLightbox(-1);
+        if (event.key === 'ArrowRight') shiftGalleryLightbox(1);
+    });
+}
+
+function openGalleryLightbox(index) {
+    if (!galleryFilteredItems.length) return;
+    const modal = document.getElementById('galleryLightbox');
+    if (!modal) return;
+
+    galleryLightboxIndex = ((index % galleryFilteredItems.length) + galleryFilteredItems.length) % galleryFilteredItems.length;
+    renderGalleryLightboxSlide();
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeGalleryLightbox() {
+    const modal = document.getElementById('galleryLightbox');
+    if (!modal) return;
+    modal.classList.add('hidden');
+    document.body.style.overflow = '';
+}
+
+function shiftGalleryLightbox(delta) {
+    if (!galleryFilteredItems.length) return;
+    galleryLightboxIndex = (galleryLightboxIndex + delta + galleryFilteredItems.length) % galleryFilteredItems.length;
+    renderGalleryLightboxSlide();
+}
+
+function renderGalleryLightboxSlide() {
+    const item = galleryFilteredItems[galleryLightboxIndex];
+    if (!item) return;
+
+    const img = document.getElementById('galleryLightboxImage');
+    const caption = document.getElementById('galleryLightboxCaption');
+    const meta = document.getElementById('galleryLightboxMeta');
+    const category = document.getElementById('galleryLightboxCategory');
+    const details = document.getElementById('galleryLightboxDetails');
+    const description = document.getElementById('galleryLightboxDescription');
+    const prevBtn = document.getElementById('galleryLightboxPrev');
+    const nextBtn = document.getElementById('galleryLightboxNext');
+
+    if (!img || !caption || !meta || !category) return;
+
+    const categoryMeta = getGalleryCategoryMeta(item.category);
+    const total = galleryFilteredItems.length;
+    const detailsRows = [
+        item.objectName ? `<div><span class="text-cyan-300/80">Object:</span> ${escapeHTML(item.objectName)}</div>` : '',
+        item.photographer ? `<div><span class="text-cyan-300/80">Captured By:</span> ${escapeHTML(item.photographer)}</div>` : '',
+        item.location ? `<div><span class="text-cyan-300/80">Location:</span> ${escapeHTML(item.location)}</div>` : '',
+        item.telescope ? `<div><span class="text-cyan-300/80">Telescope:</span> ${escapeHTML(item.telescope)}</div>` : '',
+        item.camera ? `<div><span class="text-cyan-300/80">Camera:</span> ${escapeHTML(item.camera)}</div>` : '',
+        item.exposure ? `<div><span class="text-cyan-300/80">Exposure:</span> ${escapeHTML(item.exposure)}</div>` : '',
+    ].filter(Boolean).join('');
+
+    img.src = item.url;
+    img.alt = item.caption;
+    caption.textContent = item.caption;
+    category.innerHTML = `<i class="fas ${categoryMeta.icon} mr-1"></i>${categoryMeta.label}`;
+    meta.textContent = `${formatGalleryDate(item.timelineTs)} | ${formatGalleryRelative(item.timelineTs)} | Slide ${galleryLightboxIndex + 1} of ${total}`;
+    if (details) details.innerHTML = detailsRows || '<div class="text-gray-500">No technical details provided.</div>';
+    if (description) {
+        description.textContent = item.description || 'No additional description provided for this capture.';
+    }
+
+    if (prevBtn) prevBtn.disabled = total <= 1;
+    if (nextBtn) nextBtn.disabled = total <= 1;
+}
+
+function renderHomeGalleryScroller(items) {
+    const track = document.getElementById('homeGalleryTrack');
+    if (!track) return;
+
+    const imageOnly = items.filter(item => item.type === 'image');
+    const pool = imageOnly.length ? imageOnly : items;
+
+    if (!pool.length) {
+        track.classList.add('home-gallery-track--static');
+        track.innerHTML = `
+            <a href="gallery.html" class="home-gallery-empty">
+                Gallery stream will appear here as soon as new images are uploaded.
+            </a>
+        `;
+        return;
+    }
+
+    const baseCount = Math.min(Math.max(pool.length, 8), 14);
+    const baseItems = [];
+    for (let i = 0; i < baseCount; i++) {
+        baseItems.push(pool[i % pool.length]);
+    }
+
+    const doubled = baseItems.concat(baseItems);
+    const scrollDuration = Math.max(26, baseItems.length * 4);
+    track.style.setProperty('--home-scroll-duration', `${scrollDuration}s`);
+    track.classList.remove('home-gallery-track--static');
+
+    track.innerHTML = doubled.map((item, idx) => {
+        const caption = escapeHTML(item.caption);
+        const mirrorAttr = idx >= baseItems.length ? 'aria-hidden="true" tabindex="-1"' : '';
+
+        return `
+            <a href="gallery.html" class="home-gallery-item" title="${caption}" ${mirrorAttr}>
+                <img src="${item.url}" alt="${caption}" loading="lazy">
+            </a>
+        `;
+    }).join('');
 }
 
 // ============================================================
